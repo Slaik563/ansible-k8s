@@ -4,9 +4,9 @@ node_role: infrastructure
 
 # Настройки сети (уже настроены в Ubuntu)
 network_interface: ens33
-network_ip: 192.168.1.15
+network_ip: 10.0.2.15
 network_netmask: 255.255.255.0
-network_gateway: 192.168.1.1
+network_gateway: 10.0.2.0
 
 # Настройки Kubernetes
 kubernetes_enabled: false

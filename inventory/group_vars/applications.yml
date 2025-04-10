@@ -19,13 +19,13 @@ node_labels:
 
 # Настройки ресурсов (уже выделены в ВМ)
 resources:
-  cpu: "2"
-  memory: "6Gi"
-  storage: "40Gi"
+  cpu: "1"
+  memory: "1Gi"
+  storage: "20Gi"
 
 # Настройки для приложений
 application_settings:
-  max_pods: 50
+  max_pods: 10
   container_runtime: containerd
   enable_gpu: false
 
