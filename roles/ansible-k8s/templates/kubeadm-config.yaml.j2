@@ -1,0 +1,22 @@
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: InitConfiguration
+nodeRegistration:
+  criSocket: unix:///var/run/containerd/containerd.sock
+  name: "{{ inventory_hostname }}"
+localAPIEndpoint:
+  advertiseAddress: "{{ ansible_default_ipv4.address }}"
+  bindPort: 6443
+---
+apiVersion: kubeadm.k8s.io/v1beta3
+kind: ClusterConfiguration
+kubernetesVersion: {{ kubernetes_version }}
+networking:
+  podSubnet: {{ pod_network_cidr }}
+  serviceSubnet: {{ service_cidr }}
+controlPlaneEndpoint: "{{ groups['k8s_masters'][0] }}:6443"
+apiServer:
+  certSANs:
+    - "{{ groups['k8s_masters'][0] }}"
+    - "{{ ansible_default_ipv4.address }}"
+    - "127.0.0.1"
+    - "localhost" 

@@ -1,0 +1,16 @@
+---
+- name: Configure system for Kubernetes
+  include_tasks: system.yml
+  when: kubernetes_enabled | default(true)
+
+- name: Configure Docker
+  include_tasks: docker.yml
+  when: kubernetes_enabled | default(true)
+
+- name: Configure Kubernetes
+  include_tasks: kubernetes.yml
+  when: kubernetes_enabled | default(true)
+
+- name: Configure node labels
+  include_tasks: labels.yml
+  when: kubernetes_enabled | default(true) 

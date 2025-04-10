@@ -1,0 +1,7 @@
+---
+- name: Add node labels
+  command: kubectl label nodes {{ inventory_hostname }} {{ item.key }}={{ item.value }} --overwrite
+  become: true
+  when: inventory_hostname in groups['kubernetes'][0]
+  with_items: "{{ node_labels | dict2items }}"
+  ignore_errors: yes 
