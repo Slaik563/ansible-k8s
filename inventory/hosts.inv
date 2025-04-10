@@ -1,0 +1,15 @@
+[rpi_k8s:children]
+infrastructure
+kubernetes
+applications
+
+[infrastructure]
+infra-node ansible_host=192.168.1.15
+
+[kubernetes]
+k8s-node-1 ansible_host=192.168.1.23
+k8s-node-2 ansible_host=192.168.1.5
+
+[applications]
+app-node-1 ansible_host=192.168.1.8
+app-node-2 ansible_host=192.168.1.40

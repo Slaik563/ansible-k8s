@@ -1,0 +1,25 @@
+---
+# Роль ноды
+node_role: infrastructure
+
+# Настройки сети (уже настроены в Ubuntu)
+network_interface: ens33
+network_ip: 192.168.1.15
+network_netmask: 255.255.255.0
+network_gateway: 192.168.1.1
+
+# Настройки Kubernetes
+kubernetes_enabled: false
+kubelet_enabled: false
+kubeadm_enabled: false
+
+# Метки ноды
+node_labels:
+  role: infrastructure
+  type: infra
+
+# Настройки Docker
+docker_version: "20.10.23"
+
+# Настройки для уже существующей ВМ
+existing_vm: true 

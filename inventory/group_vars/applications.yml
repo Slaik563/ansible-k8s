@@ -1,0 +1,36 @@
+---
+# Роль ноды
+node_role: applications
+
+# Настройки сети (уже настроены в Ubuntu)
+network_interface: ens33
+network_netmask: 255.255.255.0
+network_gateway: 192.168.1.1
+
+# Настройки Kubernetes
+kubernetes_enabled: true
+kubelet_enabled: true
+kubeadm_enabled: true
+
+# Метки ноды
+node_labels:
+  role: applications
+  type: app
+
+# Настройки ресурсов (уже выделены в ВМ)
+resources:
+  cpu: "2"
+  memory: "6Gi"
+  storage: "40Gi"
+
+# Настройки для приложений
+application_settings:
+  max_pods: 50
+  container_runtime: containerd
+  enable_gpu: false
+
+# Настройки Docker
+docker_version: "20.10.23"
+
+# Настройки для уже существующих ВМ
+existing_vm: true 

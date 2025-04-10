@@ -1,0 +1,165 @@
+---
+- hosts: rpi_k8s
+  gather_facts: true
+  any_errors_fatal: true
+  tasks:
+    - name: Check if SSH is available
+      wait_for:
+        port: 22
+        host: '{{ (ansible_ssh_host|default(ansible_host))|default(inventory_hostname) }}'
+        search_regex: OpenSSH
+        delay: 5
+        timeout: 30
+
+- hosts: infrastructure
+  any_errors_fatal: true
+  tasks:
+    - name: Configure infrastructure node
+      include_role:
+        name: ansible-k8s
+      vars:
+        node_type: infrastructure
+
+- hosts: kubernetes
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Removing docker.io
+      apt:
+        name: docker.io
+        state: absent
+        purge: true
+      become: true
+
+    - name: Adding Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+      become: true
+
+    - name: Adding Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+        state: present
+      become: true
+
+    - name: Installing Docker
+      apt:
+        name: "docker-ce={{ docker_version }}"
+        state: present
+      become: true
+
+    - name: Ensuring docker Service Is Started and Enabled On Boot
+      service:
+        name: docker
+        state: started
+        enabled: true
+      become: true
+
+    - name: Adding Kubernetes GPG key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+      become: true
+
+    - name: Adding Kubernetes repository
+      apt_repository:
+        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+      become: true
+
+    - name: Installing Kubernetes packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      become: true
+      with_items:
+        - kubelet
+        - kubeadm
+        - kubectl
+  roles:
+    - role: ansible-k8s
+      vars:
+        node_type: kubernetes
+
+- hosts: applications
+  any_errors_fatal: true
+  pre_tasks:
+    - name: Removing docker.io
+      apt:
+        name: docker.io
+        state: absent
+        purge: true
+      become: true
+
+    - name: Adding Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+      become: true
+
+    - name: Adding Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+        state: present
+      become: true
+
+    - name: Installing Docker
+      apt:
+        name: "docker-ce={{ docker_version }}"
+        state: present
+      become: true
+
+    - name: Ensuring docker Service Is Started and Enabled On Boot
+      service:
+        name: docker
+        state: started
+        enabled: true
+      become: true
+
+    - name: Adding Kubernetes GPG key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+      become: true
+
+    - name: Adding Kubernetes repository
+      apt_repository:
+        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+      become: true
+
+    - name: Installing Kubernetes packages
+      apt:
+        name: "{{ item }}"
+        state: present
+      become: true
+      with_items:
+        - kubelet
+        - kubeadm
+        - kubectl
+  roles:
+    - role: ansible-k8s
+      vars:
+        node_type: applications
+
+- hosts: kubernetes[0]
+  tasks:
+    - name: Initialize Kubernetes cluster
+      command: kubeadm init --pod-network-cidr=10.244.0.0/16
+      become: true
+      register: kubeadm_init
+
+    - name: Extract join command
+      set_fact:
+        join_command: "{{ kubeadm_init.stdout_lines | select('match', '^.*kubeadm join.*$') | first }}"
+      when: kubeadm_init.stdout is defined
+
+    - name: Install Weave network plugin
+      command: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+      become: true
+
+- hosts: kubernetes[1:], applications
+  tasks:
+    - name: Join Kubernetes cluster
+      command: "{{ hostvars[groups['kubernetes'][0]]['join_command'] }}"
+      become: true
