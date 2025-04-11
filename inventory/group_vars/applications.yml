@@ -33,4 +33,8 @@ application_settings:
 docker_version: "20.10.23"
 
 # Настройки для уже существующих ВМ
-existing_vm: true 
+existing_vm: true
+
+# IP-адреса приложений
+app-node-1 ansible_host=10.0.2.9
+app-node-2 ansible_host=10.0.2.8 

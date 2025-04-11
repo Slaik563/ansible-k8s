@@ -22,4 +22,7 @@ node_labels:
 docker_version: "20.10.23"
 
 # Настройки для уже существующей ВМ
-existing_vm: true 
+existing_vm: true
+
+# IP-адрес инфраструктуры
+infra-node ansible_host=10.0.2.10 

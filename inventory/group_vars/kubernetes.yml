@@ -2,11 +2,6 @@
 # Роль ноды
 node_role: kubernetes
 
-# Настройки сети (уже настроены в Ubuntu)
-network_interface: ens33
-network_netmask: 255.255.255.0
-network_gateway: 10.0.2.0
-
 # Настройки Kubernetes
 kubernetes_enabled: true
 kubelet_enabled: true
@@ -28,4 +23,8 @@ docker_version: "20.10.23"
 container_runtime: containerd
 
 # Настройки для уже существующих ВМ
-existing_vm: true 
+existing_vm: true
+
+# IP-адреса Kubernetes
+k8s-node-1 ansible_host=10.0.2.7
+k8s-node-2 ansible_host=10.0.2.11 
